@@ -65,6 +65,8 @@ class WraperComplete(object):
       CXCursorKind.OBJC_PROPERTY_DECL: self._objc_property,
       CXCursorKind.OBJC_INSTANCE_METHOD_DECL: self._objc_instance_method,
       CXCursorKind.OBJC_CLASS_METHOD_DECL: self._objc_class_method,
+      CXCursorKind.OBJC_INTERFACE_DECL: self._objc_interface,
+      CXCursorKind.OBJC_PROTOCOL_DECL: self._objc_protocol,
     }
 
 
@@ -80,11 +82,27 @@ class WraperComplete(object):
     trigger, contents = self._attach(v)
     return (trigger, contents)
 
+  def _objc_interface(self, v):
+    objc_class, contents = self._attach(v)
+    trigger = "%s\t%s" % (contents, "Class")
+    return (trigger, objc_class)
+
+  def _objc_protocol(self, v):
+    objc_prot, contents = self._attach(v)
+    trigger = "%s\t%s" % (contents, "Protocol")
+    return (trigger, objc_prot)
+
   def _objc_ivar(self, v):
-  	  return self._var(v)
+    ivar = v.name
+    ivar_type = v[0].value
+    trigger = "%s %s\t%s" % (ivar_type, ivar, "Ivar")
+    return (trigger, ivar)
   	  
   def _objc_property(self, v):
-  	  return self._var(v)
+    prop = v.name
+    prop_type = v[0].value
+    trigger = "%s %s\t%s" % (prop_type, prop, "Property")
+    return (trigger, prop)
   	  
   def _objc_instance_method(self, v):
   	  _v, contents = self._objc_attach(v)
@@ -104,10 +122,11 @@ class WraperComplete(object):
       trunk = v[i]
       value = trunk.value
       kind = trunk.kind
+      print("Kind:{}".format(kind))
       if kind == CXCompletionChunkKind.Placeholder:
         value = "${%d:%s}" % (holder_idx, value)
         holder_idx += 1
-      elif kind == CXCompletionChunkKind.Informative:
+      elif kind == CXCompletionChunkKind.Informative or kind == CXCompletionChunkKind.ResultType:
         value = ""
       contents += value
       decl += trunk.value
