@@ -5,8 +5,26 @@
         // For example, you can use "c++": ["-std=c++11"] to enable C++11 features.
         "c++" : [],
         "c": ["-std=c99"],
-        "objc": [],
-        "objc++": []
+        "objc": [
+        			"-fobjc-runtime=objfw",
+        			"-fobjc-arc",
+        			 "-fexceptions",
+        			 "-fobjc-exceptions",
+        			 "-funwind-tables",
+        			 "-fconstant-string-class=OFConstantString",
+        			 "-fno-constant-cfstrings",
+        			 "-fblocks"
+        		],
+        "objc++": [
+        			"-fobjc-runtime=objfw",
+        			"-fobjc-arc",
+        			 "-fexceptions",
+        			 "-fobjc-exceptions",
+        			 "-funwind-tables",
+        			 "-fconstant-string-class=OFConstantString",
+        			 "-fno-constant-cfstrings",
+        			 "-fblocks"
+        			]
     },
 
     // open or close inhibit the sublime text 3 built in word completions
