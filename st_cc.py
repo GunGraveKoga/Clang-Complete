@@ -60,6 +60,11 @@ class WraperComplete(object):
       CXCursorKind.CLASS_TEMPLATE: lambda v:self._struct(v, "classTemplate"),
       CXCursorKind.CLASS_DECL: lambda v:self._struct(v, "class"),
       CXCursorKind.STRUCT_DECL: self._struct,
+      
+      CXCursorKind.OBJC_IVAR_DECL: self._objc_ivar,
+      CXCursorKind.OBJC_PROPERTY_DECL: self._objc_property,
+      CXCursorKind.OBJC_INSTANCE_METHOD_DECL: self._objc_instance_method,
+      CXCursorKind.OBJC_CLASS_METHOD_DECL: self._objc_class_method,
     }
 
 
@@ -75,7 +80,21 @@ class WraperComplete(object):
     trigger, contents = self._attach(v)
     return (trigger, contents)
 
-
+  def _objc_ivar(self, v):
+  	  return self._var(v)
+  	  
+  def _objc_property(self, v):
+  	  return self._var(v)
+  	  
+  def _objc_instance_method(self, v):
+  	  _v, contents = self._objc_attach(v)
+  	  trigger = "-{}\t{}".format(_v, "Instance Method")
+  	  return (trigger, contents)
+  	  
+  def _objc_class_method(self, v):
+  	  _v, contents = self._objc_attach(v)
+  	  trigger = "+{}\t{}".format(_v, "Class Method")
+  	  return (trigger, contents)
 
   def _attach(self, v, begin_idx=0):
     decl = ""
@@ -84,18 +103,38 @@ class WraperComplete(object):
     for i in range(begin_idx, v.length):
       trunk = v[i]
       value = trunk.value
-      delc_value = value
       kind = trunk.kind
       if kind == CXCompletionChunkKind.Placeholder:
         value = "${%d:%s}" % (holder_idx, value)
         holder_idx += 1
       elif kind == CXCompletionChunkKind.Informative:
         value = ""
-      elif kind== CXCompletionChunkKind.ResultType:
-        value = ""
-        delc_value = ""
       contents += value
-      decl += delc_value
+      decl += trunk.value
+    return decl, contents
+    
+  def _objc_attach(self, v, begin_idx=0):
+    decl = ""
+    contents = ""
+    holder_idx = 1
+    for i in range(begin_idx, v.length):
+      trunk = v[i]
+      value = trunk.value
+      kind = trunk.kind
+      print("Kind:{}".format(kind))
+      if kind == CXCompletionChunkKind.Placeholder:
+        value = "${%d:%s}" % (holder_idx, value)
+        holder_idx += 1
+      elif kind == CXCompletionChunkKind.Informative or kind == CXCompletionChunkKind.ResultType:
+        value = ""
+      contents += value
+      if kind == CXCompletionChunkKind.ResultType:
+        decl += "({})[".format(trunk.value)
+      else:
+        decl += trunk.value
+      #print("{}_decl:{}".format(i, decl))
+      #print("{}_contents:{}".format(i, contents))
+    decl += "]"
     return decl, contents
 
 
