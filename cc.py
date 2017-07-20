@@ -1,16 +1,21 @@
 from ctypes import cdll, Structure, POINTER, c_char_p, c_void_p, c_uint, c_bool, c_ulong, c_int
 from .clang import CXUnsavedFile, CXCompletionChunkKind, CXCursorKind
 from sys import platform as _platform
+from sys import maxsize as _maxsize
 import os
+import platform as m_platform
 import re
-
 
 current_path = os.path.dirname(os.path.abspath(__file__))
 if _platform == "win32":
+  bitness = "x86"
+  if m_platform.architecture()[0] == '64bit' and _maxsize > 2**32:
+    bitness = "x86_64"
   os.environ["PATH"] = "%s/lib" % current_path + os.pathsep + os.environ["PATH"]
-  libcc = cdll.LoadLibrary("%s/lib/libcc.dll" % current_path)
+  lib_path = os.path.join(current_path, "lib", bitness, "libcc.dll")
+  libcc = cdll.LoadLibrary(lib_path)
 else:
-  libcc = cdll.LoadLibrary("%s/lib/libcc.so" % current_path)
+  libcc = cdll.LoadLibrary(os.path.join(current_path, "lib", "libcc.so"))
 
 class _cc_symbol(Structure):
   pass

@@ -14,7 +14,7 @@
 
     // add include options to clang
     // this can also be specified as project specific options.
-    // add something like the following to the `settings` section in your `<name>.sublime-project` file:
+    // add somthing like the following to the `sttings` section in your `<name>.sublime-project` file:
     // 
     // 
     //     
@@ -33,14 +33,10 @@
     // to the "include_options" defined in cc.sublime-settings.
    "include_options":
    [
-        "-F/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/",
-        "-isystem", "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include",
-        "-isystem", "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/4.2.1",
-        "-isystem", "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1",
-        "-isystem", "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/8.0.0/include/",
-        // "-isystem", "/usr/include",
-        // "-isystem", "/usr/include/c++/*",
-        "-isystem", "/usr/local/opt/llvm/include",
+        "-isystem", "C:\\msys64\\mingw32\\include",
+		"-isystem", "C:\\msys64\\mingw32\\i686-w64-mingw32\\include",
+		"-isystem", "C:\\msys64\\mingw32\\i686-w64-mingw32\\include\\c++\\6.3.0",
+		"-isystem", "C:\\msys64\\mingw32\\i686-w64-mingw32\\include\\c++\\6.3.0\\i686-w64-mingw32",
         "-Wall"
     ],
 
