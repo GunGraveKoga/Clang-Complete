@@ -4,6 +4,8 @@ import os
 import sublime, sublime_plugin
 from sys import maxsize as word_size
 import platform
+import plistlib
+import shutil
 
 from .clang_error import *
 from .cc import *
@@ -207,6 +209,8 @@ class Complete(object):
   symbol_map = {}
   wraper = WraperComplete()
   member_regex = re.compile(r"(([a-zA-Z_]+[0-9_]*)|([\)\]])+)((\.)|(->)|(::))$")
+  objc_syntax = None
+  objc_syntax_tmp = None
 
   @staticmethod
   def clean():
@@ -214,6 +218,21 @@ class Complete(object):
 
   @staticmethod
   def get_settings():
+    if Complete.objc_syntax is None:
+      current_real_path = os.path.dirname(os.path.abspath(__file__))
+      current_path = "Packages/Clang-Complete"
+      file_path = os.path.join(current_real_path, "objc.sublime-syntax")
+      if Complete.objc_syntax_tmp is None:
+        file_path_tmp = os.path.join(current_real_path, "tmp")
+        if not os.path.isdir(file_path_tmp):
+          os.mkdir(file_path_tmp)
+        file_path_tmp = os.path.join(file_path_tmp, "objc.sublime-syntax")
+        if os.path.isfile(file_path_tmp):
+          os.remove(file_path_tmp)
+        shutil.copy2(file_path, file_path_tmp)
+        file_path_tmp = os.path.join(current_path, "tmp", "objc.sublime-syntax")
+        Complete.objc_syntax_tmp = file_path_tmp
+      Complete.objc_syntax = file_path
     return sublime.load_settings("cc.sublime-settings")
 
   @staticmethod
@@ -221,6 +240,11 @@ class Complete(object):
     settings = Complete.get_settings()
     additional_lang_opts = settings.get("additional_language_options", {})
     language = get_language(view)
+    if language == "objc":
+      old_syntax = view.settings().get("syntax")
+      if old_syntax != Complete.objc_syntax_tmp:
+        view.settings().set("old_syntax", old_syntax)
+        view.set_syntax_file(Complete.objc_syntax_tmp)
     project_settings = view.settings()
     bitness = "32bit"
     if platform.architecture()[0] == "64bit" and word_size > 2**32:
@@ -230,6 +254,8 @@ class Complete(object):
     #include_opts = settings.get("include_options", []) + project_settings.get("cc_include_options", [])
     include_opts = global_includes.get(bitness, []) + project_includes.get(bitness, [])
     print(include_opts)
+    syntax_file = view.settings().get('syntax')
+    print(syntax_file)
 
     window = sublime.active_window()
     variables = window.extract_variables()
