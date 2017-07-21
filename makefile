@@ -26,10 +26,23 @@ ifeq ($(OS),Windows_NT)
 	CFLAGS = -g -Wall
 	TARGET_PLATFORM := $(shell gcc -dumpmachine)
 	ifeq ($(TARGET_PLATFORM),x86_64-w64-mingw32)
-		LIBCC = lib/x86_64/libcc.dll
+		LIBCC_PATH = lib/x86_64
+		EH_LIB = /mingw64/bin/libgcc_s_seh-1.dll
+		THREAD_LIB = /mingw64/bin/libwinpthread-1.dll
+		CLANG_LIB = /mingw64/bin/clang.dll
+		CXX_LIB = /mingw64/bin/libstdc++-6.dll
+		LLVM_LIB = /mingw64/bin/LLVM.dll
+		LIBFFI = /mingw64/bin/libffi-6.dll
 	else
-		LIBCC = lib/x86/libcc.dll
+		LIBCC_PATH = lib/x86
+		EH_LIB = /mingw32/bin/libgcc_s_dw2-1.dll
+		THREAD_LIB = /mingw32/bin/libwinpthread-1.dll
+		CLANG_LIB = /mingw32/bin/clang.dll
+		CXX_LIB = /mingw32/bin/libstdc++-6.dll
+		LLVM_LIB = /mingw32/bin/LLVM.dll
+		LIBFFI = /mingw32/bin/libffi-6.dll
 	endif
+	LIBCC = $(LIBCC_PATH)/libcc.dll
 endif
 
 
@@ -51,7 +64,14 @@ linux_config:
 	sudo ln -sf /usr/lib/llvm-3.5/lib/libclang-3.5.so.1 ./lib/libclang.so
 
 cc_lib: $(FILES)
+	mkdir -p $(LIBCC_PATH)
 	$(CC) -shared -o $(LIBCC)  $(CFLAGS) $^ -L$(CLANG) $(LIB_FLAG) -I$(CLANG)/include  -lclang
+	cp $(EH_LIB) $(LIBCC_PATH)
+	cp $(THREAD_LIB) $(LIBCC_PATH)
+	cp $(CLANG_LIB) $(LIBCC_PATH)
+	cp $(CXX_LIB) $(LIBCC_PATH)
+	cp $(LLVM_LIB) $(LIBCC_PATH)
+	cp $(LIBFFI) $(LIBCC_PATH)
 
 link:
 	ln -s $(PWD) $(ST3)
