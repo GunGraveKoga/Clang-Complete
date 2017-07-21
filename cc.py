@@ -13,6 +13,7 @@ if _platform == "win32":
     bitness = "x86_64"
   os.environ["PATH"] = "%s/lib" % current_path + os.pathsep + os.environ["PATH"]
   lib_path = os.path.join(current_path, "lib", bitness, "libcc.dll")
+  print("Loading {}...".format(lib_path))
   libcc = cdll.LoadLibrary(lib_path)
 else:
   libcc = cdll.LoadLibrary(os.path.join(current_path, "lib", "libcc.so"))
