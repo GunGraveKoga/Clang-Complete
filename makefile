@@ -24,8 +24,8 @@ ifeq ($(OS),Windows_NT)
 	CLANG = "$(CURDIR)/lib"
 	CC = gcc
 	CFLAGS = -g -Wall
-	TARGET_PLATFORM := $(shell $(CC) -dumpmachine)
-	ifeq ($(TARGET_PLATFORM),x86_64-w64-windows-gnu)
+	TARGET_PLATFORM := $(shell gcc -dumpmachine)
+	ifeq ($(TARGET_PLATFORM),x86_64-w64-mingw32)
 		LIBCC = lib/x86_64/libcc.dll
 	else
 		LIBCC = lib/x86/libcc.dll
