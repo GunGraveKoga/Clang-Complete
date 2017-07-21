@@ -48,7 +48,9 @@
     // if "cc_include_options" exists in your project settings, it'll override rather than add
     // to the "include_options" defined in cc.sublime-settings.
    "include_options":
-   [
+   {
+     "32bit":
+       [
         "-isystem", "C:\\msys64\\mingw32\\lib\\clang\\4.0.0\\include",
         "-isystem", "C:\\msys64\\mingw32\\include",
 		"-isystem", "C:\\msys64\\mingw32\\i686-w64-mingw32\\include",
@@ -56,6 +58,16 @@
 		"-isystem", "C:\\msys64\\mingw32\\i686-w64-mingw32\\include\\c++\\6.3.0\\i686-w64-mingw32",
         "-Wall"
     ],
+    "64bit":
+      [
+        "-isystem", "C:\\msys64\\mingw64\\lib\\clang\\4.0.0\\include",
+        "-isystem", "C:\\msys64\\mingw64\\include",
+		"-isystem", "C:\\msys64\\mingw64\\x86_64-w64-mingw32\\include",
+		"-isystem", "C:\\msys64\\mingw64\\x86_64-w64-mingw32\\include\\c++\\6.3.0",
+		"-isystem", "C:\\msys64\\mingw64\\x86_64-w64-mingw32\\include\\c++\\6.3.0\\x86_64-w64-mingw32",
+        "-Wall"
+    ],
+   },
 
     // do not show markers for warnings or errors on save.
     "hide_error_mark": false,
