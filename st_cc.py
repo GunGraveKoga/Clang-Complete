@@ -2,6 +2,8 @@ import threading
 import re
 import os
 import sublime, sublime_plugin
+from sys import maxsize as word_size
+import platform
 
 from .clang_error import *
 from .cc import *
@@ -220,7 +222,14 @@ class Complete(object):
     additional_lang_opts = settings.get("additional_language_options", {})
     language = get_language(view)
     project_settings = view.settings()
-    include_opts = settings.get("include_options", []) + project_settings.get("cc_include_options", [])
+    bitness = "32bit"
+    if platform.architecture()[0] == "64bit" and word_size > 2**32:
+      bitness = "64bit"
+    global_includes = settings.get("include_options", {})
+    project_includes = project_settings.get("cc_include_options", {})
+    #include_opts = settings.get("include_options", []) + project_settings.get("cc_include_options", [])
+    include_opts = global_includes.get(bitness, []) + project_includes.get(bitness, [])
+    print(include_opts)
 
     window = sublime.active_window()
     variables = window.extract_variables()
