@@ -5,14 +5,30 @@ from sys import maxsize as _maxsize
 import os
 import platform as m_platform
 import re
+import sublime
+
+def run_once(f):
+  def wrapper(*args, **kwargs):
+    if not wrapper.has_run:
+      wrapper.has_run = True
+      return f(*args, **kwargs)
+  wrapper.has_run = False
+  return wrapper
+  
+@run_once
+def set_plugin_path(path):
+  print("Appending plugin path {} to PATH".format(path))
+  os.environ["PATH"] = path + os.pathsep + os.environ["PATH"]
 
 current_path = os.path.dirname(os.path.abspath(__file__))
 if _platform == "win32":
   bitness = "x86"
   if m_platform.architecture()[0] == '64bit' and _maxsize > 2**32:
     bitness = "x86_64"
-  os.environ["PATH"] = "%s/lib" % current_path + os.pathsep + os.environ["PATH"]
-  lib_path = os.path.join(current_path, "lib", bitness, "libcc.dll")
+  
+  lib_bin_dir = "{}\\lib\\{}".format(current_path, bitness)
+  set_plugin_path(lib_bin_dir)
+  lib_path = os.path.join(lib_bin_dir, "libcc.dll")
   print("Loading {}...".format(lib_path))
   libcc = cdll.LoadLibrary(lib_path)
 else:
